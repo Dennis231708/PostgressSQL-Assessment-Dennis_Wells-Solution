@@ -13,18 +13,30 @@ async function postExists(req, res, next) {
 }
 
 async function create(req, res) {
-  // your solution here
-  res.json({ data: "" });
+  const { body } = req;
+  const newPost = await service.create(body);
+  res.status(201).json({ data: newPost });
 }
 
 async function update(req, res) {
-  // your solution here
-  res.json({ data: "" });
+  const { postId } = req.params;
+  const { body } = req;
+
+  const updatedPost = await service.update(postId, body);
+
+  res.json({ data: updatedPost });
 }
 
 async function destroy(req, res) {
-  // your solution here
-  res.json({ data: "" });
+  const { postId } = req.params;
+
+  const deleted = await service.destroy(postId);
+
+  if (deleted) {
+    res.sendStatus(204);
+  } else {
+    res.sendStatus(404);
+  }
 }
 
 module.exports = {
