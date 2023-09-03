@@ -13,34 +13,26 @@ async function postExists(req, res, next) {
 }
 
 async function create(req, res) {
-  const { body } = req;
-  const newPost = await service.create(body);
-  res.status(201).json({ data: newPost });
+  const { data } = req.body;
+  const newPost = await service.create(data);
+  res.status(201).json({ data: newPost[0] });
 }
 
 async function update(req, res) {
-  const { postId } = req.params;
-  const { body } = req;
-
-  const updatedPost = await service.update(postId, body);
-
-  res.json({ data: updatedPost });
+  const postId = req.params.postId;
+  const { data } = req.body;
+  const updatedPost = await service.update(postId, data);
+  res.json({ data: updatedPost[0] });
 }
 
-async function destroy(req, res) {
-  const { postId } = req.params;
-
-  const deleted = await service.destroy(postId);
-
-  if (deleted) {
-    res.sendStatus(204);
-  } else {
-    res.sendStatus(404);
-  }
+async function deletePost(req, res) {
+  const postId = req.params.postId;
+  await service.destroy(postId);
+  res.status(204).json();
 }
 
 module.exports = {
   create: asyncErrorBoundary(create),
   update: [asyncErrorBoundary(postExists), asyncErrorBoundary(update)],
-  delete: [asyncErrorBoundary(postExists), asyncErrorBoundary(destroy)],
+  delete: [asyncErrorBoundary(postExists), asyncErrorBoundary(deletePost)],
 };

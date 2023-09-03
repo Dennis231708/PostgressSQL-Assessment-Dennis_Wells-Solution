@@ -1,25 +1,33 @@
 const knex = require("../db/connection");
 
+
 function list() {
-  return knex("comments").select("*");
+  return knex('comments').select('*');
 }
 
+
 function listCommenterCount() {
-  return knex("comments")
-    .join("users", "comments.user_id", "users.user_id")
-    .select("users.user_email as commenter_email")
-    .count("comments.comment_id as comment_count")
-    .groupBy("users.user_email")
-    .orderBy("users.user_email");
+  return knex('comments')
+    .select(
+      knex.raw('users.user_email as commenter_email'),
+      knex.raw('cast(count(comments.comment_id) as integer) as count')
+    )
+    .join('users', 'comments.commenter_id', 'users.user_id')
+    .groupBy('commenter_email')
+    .orderBy('commenter_email');
 }
 
 
 function read(commentId) {
-  return knex("comments")
-    .select("comments.comment_id", "comments.comment", "users.user_email as commenter_email", "posts.post_body as commented_post")
-    .join("users", "comments.user_id", "users.user_id")
-    .join("posts", "comments.post_id", "posts.post_id")
-    .where("comments.comment_id", commentId)
+  return knex('comments')
+    .select(
+      'comments.comment_id',
+      'comments.comment',
+      'comments.commenter_id',
+      'comments.post_id'
+      // Add other columns as needed
+    )
+    .where('comments.comment_id', commentId)
     .first();
 }
 
